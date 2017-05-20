@@ -1,4 +1,4 @@
-# cargo_toml_validate
+# cargo_toml_validate [![Build Status](https://travis-ci.org/schultyy/cargo_toml_validate.svg?branch=master)](https://travis-ci.org/schultyy/cargo_toml_validate)
 
 This is a crate which helps to validate if all mandatory fields in a `Cargo.toml` file are present.
 
