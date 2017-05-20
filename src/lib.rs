@@ -32,7 +32,9 @@ pub fn validate(cargo_toml: &str) -> Result<(), Vec<String>> {
     }
 
     if package_section.get("license").is_none() {
-        errors.push("license or license-file is missing".into());
+        if package_section.get("license-file").is_none() {
+            errors.push("license or license-file is missing".into());
+        }
     }
 
     if package_section.get("homepage").is_none() {
@@ -120,6 +122,18 @@ repository = \"https://github.com/schultyy/cargo_toml_validate\"
 ".into()
     }
 
+    fn with_license_file() -> String {
+"
+[package]
+name = \"cargo_toml_validate\"
+version = \"2.0.0\"
+authors = [\"Jan Schulte <hello@unexpected-co.de>\"]
+license-file = \"license.md\"
+description = \"This and that\"
+repository = \"https://github.com/schultyy/cargo_toml_validate\"
+".into()
+    }
+
     #[test]
     fn it_should_fail_with_errors() {
         let results = validate(&invalid_cargo_toml());
@@ -145,7 +159,6 @@ repository = \"https://github.com/schultyy/cargo_toml_validate\"
     fn it_should_fail_when_license_is_missing() {
         let results = validate(&license_is_missing());
         assert!(results.is_err());
-        println!("{:?}", results);
         assert_eq!(1, results.unwrap_err().len());
     }
 
@@ -159,7 +172,12 @@ repository = \"https://github.com/schultyy/cargo_toml_validate\"
     #[test]
     fn it_passes_with_valid_cargo_toml() {
         let results = validate(&valid_cargo_toml());
-        println!("{:?}", results);
+        assert!(results.is_ok());
+    }
+
+    #[test]
+    fn it_passes_with_license_file_instead_of_license() {
+        let results = validate(&with_license_file());
         assert!(results.is_ok());
     }
 }
