@@ -1,5 +1,6 @@
 extern crate toml;
 use toml::Value;
+use std::error::Error;
 
 struct Key {
     pub name: String,
@@ -23,7 +24,10 @@ impl Key {
 }
 
 pub fn validate(cargo_toml: &str) -> Result<(), Vec<String>> {
-    let toml_table = cargo_toml.parse::<Value>().unwrap();
+    let toml_table = match cargo_toml.parse::<Value>() {
+        Ok(table) => table,
+        Err(err) => return Err(vec!(err.description().into()))
+    };
 
     let required_keys = vec!(Key::new("description".into()),
                             Key::new_with_optional_name("license".into(), "license-file".into()),
@@ -50,10 +54,28 @@ authors = [\"Jan Schulte <hello@unexpected-co.de>\"]
 ".into()
     }
 
+    fn malformed_cargo_toml() -> String {
+"
+[package]
+name = \"cargo_toml_validate\"
+version = \"0.1.0\"
+autho hulte <hello@unexpected-co.de>\"]
+
+[dependencies]
+".into()
+    }
+
     #[test]
     fn it_should_fail_with_errors() {
         let results = validate(&invalid_cargo_toml());
         assert!(results.is_err());
         assert_eq!(4, results.unwrap_err().len());
+    }
+
+    #[test]
+    fn it_should_fail_when_cargo_toml_is_malformed() {
+        let results = validate(&malformed_cargo_toml());
+        assert!(results.is_err());
+        assert_eq!(1, results.unwrap_err().len());
     }
 }
