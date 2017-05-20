@@ -51,7 +51,11 @@ pub fn validate(cargo_toml: &str) -> Result<(), Vec<String>> {
         }
     }
 
-    Err(errors)
+    if errors.len() > 0 {
+        Err(errors)
+    } else {
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -114,6 +118,18 @@ description = \"This and that\"
 ".into()
     }
 
+    fn valid_cargo_toml() -> String {
+"
+[package]
+name = \"cargo_toml_validate\"
+version = \"2.0.0\"
+authors = [\"Jan Schulte <hello@unexpected-co.de>\"]
+license = \"MIT\"
+description = \"This and that\"
+repository = \"https://github.com/schultyy/cargo_toml_validate\"
+".into()
+    }
+
     #[test]
     fn it_should_fail_with_errors() {
         let results = validate(&invalid_cargo_toml());
@@ -148,5 +164,12 @@ description = \"This and that\"
         let results = validate(&repository_is_missing());
         assert!(results.is_err());
         assert_eq!(1, results.unwrap_err().len());
+    }
+
+    #[test]
+    fn it_passes_with_valid_cargo_toml() {
+        let results = validate(&valid_cargo_toml());
+        println!("{:?}", results);
+        assert!(results.is_ok());
     }
 }
