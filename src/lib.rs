@@ -2,6 +2,21 @@ extern crate toml;
 use toml::Value;
 use std::error::Error;
 
+/// # Examples
+///
+///```
+///use cargo_toml_validate;
+///let cargo_toml = "...";
+///
+///match cargo_toml_validate::validate(cargo_toml) {
+///    Ok(()) => { /* Everything's fine */ },
+///    Err(errors) => {
+///        for error in errors {
+///            println!("{:?}", error);
+///        }
+///    }
+///}
+///```
 pub fn validate(cargo_toml: &str) -> Result<(), Vec<String>> {
     let toml_table = match cargo_toml.parse::<Value>() {
         Ok(table) => table,
