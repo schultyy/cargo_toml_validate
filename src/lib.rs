@@ -31,22 +31,18 @@ pub fn validate(cargo_toml: &str) -> Result<(), Vec<String>> {
         errors.push("Description is missing".into());
     }
 
-    if package_section.get("license").is_none() {
-        if package_section.get("license-file").is_none() {
-            errors.push("license or license-file is missing".into());
-        }
+    if package_section.get("license").is_none() && package_section.get("license-file").is_none() {
+        errors.push("license or license-file is missing".into());
     }
 
-    if package_section.get("homepage").is_none() {
-        if package_section.get("repository").is_none() {
-            errors.push("homepage or repository are missing".into());
-        }
+    if package_section.get("homepage").is_none() && package_section.get("repository").is_none() {
+        errors.push("homepage or repository are missing".into());
     }
 
-    if errors.len() > 0 {
-        Err(errors)
-    } else {
+    if errors.is_empty() {
         Ok(())
+    } else {
+        Err(errors)
     }
 }
 
